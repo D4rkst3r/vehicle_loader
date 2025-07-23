@@ -13,24 +13,24 @@
         <div class="menu-container">
             <div class="menu-header">
                 <h1 id="menu-title">Vehicle Loader</h1>
-                <button id="close-btn" class="close-btn">&times;</button>
+                <button id="close-btn" class="close-btn" aria-label="Close menu">&times;</button>
             </div>
 
             <div class="menu-content">
                 <!-- Trailer Information -->
                 <div class="section trailer-info">
-                    <h2>Trailer Information</h2>
+                    <h2 id="trailer-info-title">Trailer Information</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <span class="label">Model:</span>
+                            <span class="label" id="model-label">Model:</span>
                             <span id="trailer-model" class="value">-</span>
                         </div>
                         <div class="info-item">
-                            <span class="label">Capacity:</span>
+                            <span class="label" id="capacity-label">Capacity:</span>
                             <span id="trailer-capacity" class="value">-</span>
                         </div>
                         <div class="info-item">
-                            <span class="label">Loaded:</span>
+                            <span class="label" id="loaded-label">Loaded:</span>
                             <span id="trailer-loaded" class="value">-</span>
                         </div>
                     </div>
@@ -38,26 +38,44 @@
 
                 <!-- Loaded Vehicles -->
                 <div class="section loaded-vehicles">
-                    <h2>Loaded Vehicles</h2>
+                    <h2 id="loaded-vehicles-title">Loaded Vehicles</h2>
                     <div id="loaded-vehicles-list" class="vehicle-list">
                         <div class="empty-state">
-                            <p>No vehicles loaded</p>
+                            <p id="no-vehicles-loaded">No vehicles loaded</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Available Vehicles -->
                 <div class="section available-vehicles">
-                    <h2>Available Vehicles</h2>
+                    <h2 id="available-vehicles-title">Available Vehicles</h2>
                     <div class="search-container">
-                        <input type="text" id="vehicle-search" placeholder="Search vehicles..." class="search-input">
-                        <select id="class-filter" class="filter-select">
+                        <input type="text" id="vehicle-search" placeholder="Search vehicles..." class="search-input"
+                            autocomplete="off" spellcheck="false">
+                        <select id="class-filter" class="filter-select" aria-label="Filter by vehicle class">
                             <option value="">All Classes</option>
                         </select>
+                        <button id="refresh-btn" class="refresh-btn" aria-label="Refresh vehicle list">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="vehicle-stats">
+                        <span id="vehicle-count">0 vehicles found</span>
+                        <span id="distance-filter">
+                            <label for="distance-range">Max Distance:</label>
+                            <input type="range" id="distance-range" min="5" max="50" value="25" step="5">
+                            <span id="distance-value">25m</span>
+                        </span>
                     </div>
                     <div id="available-vehicles-list" class="vehicle-list">
                         <div class="empty-state">
-                            <p>No vehicles available</p>
+                            <p id="no-vehicles-available">No vehicles available</p>
                         </div>
                     </div>
                 </div>
@@ -74,19 +92,84 @@
                     <div class="control-item">
                         <kbd>ESC</kbd> Close Menu
                     </div>
+                    <div class="control-item">
+                        <kbd>F5</kbd> Refresh
+                    </div>
+                </div>
+                <div class="status-bar">
+                    <span id="connection-status" class="status-indicator connected">Connected</span>
+                    <span id="last-update">Last updated: Never</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
+    <!-- Enhanced Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="loading-spinner"></div>
-        <p id="loading-text">Loading...</p>
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p id="loading-text">Loading...</p>
+            <div class="loading-progress">
+                <div id="loading-progress-bar" class="progress-bar"></div>
+            </div>
+            <div class="loading-details">
+                <span id="loading-step">Initializing...</span>
+            </div>
+        </div>
     </div>
 
     <!-- Notification Container -->
     <div id="notification-container" class="notification-container"></div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog" class="dialog-overlay hidden">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h3 id="dialog-title">Confirm Action</h3>
+            </div>
+            <div class="dialog-body">
+                <p id="dialog-message">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="dialog-footer">
+                <button id="dialog-confirm" class="btn btn-confirm">Confirm</button>
+                <button id="dialog-cancel" class="btn btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu hidden">
+        <ul class="context-menu-list">
+            <li class="context-menu-item" data-action="load">
+                <span class="context-menu-icon">📥</span>
+                <span>Load Vehicle</span>
+            </li>
+            <li class="context-menu-item" data-action="unload">
+                <span class="context-menu-icon">📤</span>
+                <span>Unload Vehicle</span>
+            </li>
+            <li class="context-menu-divider"></li>
+            <li class="context-menu-item" data-action="info">
+                <span class="context-menu-icon">ℹ️</span>
+                <span>Vehicle Info</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Vehicle Info Modal -->
+    <div id="vehicle-info-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Vehicle Information</h3>
+                <button id="modal-close" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="vehicle-info-content" class="vehicle-info-grid">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
