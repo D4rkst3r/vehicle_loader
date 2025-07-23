@@ -21,7 +21,7 @@ Config.Trailers = {
         },
         allowedClasses = { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12 } -- Most vehicle classes
     },
-    ['tr4'] = {                                                  -- Large Trailer
+    ['tr4'] = {                                                    -- Large Trailer
         maxVehicles = 2,
         loadPositions = {
             { x = 0.0, y = -1.5, z = 1.0, heading = 0.0 },
@@ -38,7 +38,7 @@ Config.Trailers = {
         },
         allowedClasses = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 }
     },
-    ['trailers'] = { -- Standard Trailer
+    ['flatbed'] = { -- Standard Trailer
         maxVehicles = 1,
         loadPositions = {
             { x = 0.0, y = -2.0, z = 1.0, heading = 0.0 }
