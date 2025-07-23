@@ -111,18 +111,20 @@ function UnloadVehicleFromTrailer(slotIndex, trailer)
 
     local trailerId = NetworkGetNetworkIdFromEntity(trailer)
 
-    if not LoadedVehicles[trailerId] or not LoadedVehicles[trailerId][slotIndex] then
+    -- Get LoadedVehicles from main.lua
+    local loadedVehicles = GetLoadedVehicles()
+    if not loadedVehicles[trailerId] or not loadedVehicles[trailerId][slotIndex] then
         ShowNotification(Config.Locales[Config.Locale]['unloading_failed'])
         PlaySound(Config.Sounds.error)
         return { success = false, message = 'No vehicle in this slot' }
     end
 
-    local vehicleData = LoadedVehicles[trailerId][slotIndex]
+    local vehicleData = loadedVehicles[trailerId][slotIndex]
     local vehicle = vehicleData.entity
 
     if not DoesEntityExist(vehicle) then
         -- Clean up invalid vehicle reference
-        LoadedVehicles[trailerId][slotIndex] = nil
+        SetLoadedVehicleSlot(trailerId, slotIndex, nil)
         ShowNotification(Config.Locales[Config.Locale]['unloading_failed'])
         PlaySound(Config.Sounds.error)
         return { success = false, message = 'Vehicle no longer exists' }
@@ -181,7 +183,8 @@ end
 
 -- Check if vehicle is already loaded
 function IsVehicleLoaded(vehicle)
-    for trailerId, vehicles in pairs(LoadedVehicles) do
+    local loadedVehicles = GetLoadedVehicles()
+    for trailerId, vehicles in pairs(loadedVehicles) do
         for _, vehicleData in pairs(vehicles) do
             if vehicleData.entity == vehicle then
                 return true
@@ -193,12 +196,13 @@ end
 
 -- Get loaded vehicle count for trailer
 function GetLoadedVehicleCount(trailerId)
-    if not LoadedVehicles[trailerId] then
+    local loadedVehicles = GetLoadedVehicles()
+    if not loadedVehicles[trailerId] then
         return 0
     end
 
     local count = 0
-    for _, vehicleData in pairs(LoadedVehicles[trailerId]) do
+    for _, vehicleData in pairs(loadedVehicles[trailerId]) do
         if DoesEntityExist(vehicleData.entity) then
             count = count + 1
         end
@@ -209,12 +213,13 @@ end
 
 -- Get available slot index
 function GetAvailableSlot(trailerId, maxSlots)
-    if not LoadedVehicles[trailerId] then
+    local loadedVehicles = GetLoadedVehicles()
+    if not loadedVehicles[trailerId] then
         return 1
     end
 
     for i = 1, maxSlots do
-        if not LoadedVehicles[trailerId][i] then
+        if not loadedVehicles[trailerId][i] then
             return i
         end
     end
@@ -281,10 +286,15 @@ end
 
 -- Clean up invalid vehicle references
 function CleanupInvalidVehicles()
-    for trailerId, vehicles in pairs(LoadedVehicles) do
+    local loadedVehicles = GetLoadedVehicles()
+    if not loadedVehicles then
+        return
+    end
+
+    for trailerId, vehicles in pairs(loadedVehicles) do
         for slotIndex, vehicleData in pairs(vehicles) do
             if not DoesEntityExist(vehicleData.entity) then
-                LoadedVehicles[trailerId][slotIndex] = nil
+                SetLoadedVehicleSlot(trailerId, slotIndex, nil)
                 if Config.Debug then
                     print(string.format("[VehicleLoader] Cleaned up invalid vehicle reference in trailer %s slot %s",
                         trailerId, slotIndex))
