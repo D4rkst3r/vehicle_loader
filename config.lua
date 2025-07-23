@@ -1,7 +1,7 @@
 Config = {}
 
 -- Debug Mode
-Config.Debug = false
+Config.Debug = true
 
 -- Performance Settings
 Config.CheckInterval = 1000   -- ms between checks

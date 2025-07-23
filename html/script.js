@@ -743,6 +743,22 @@ class VehicleLoaderUI {
 
   // Utility functions
   sendNUICallback(endpoint, data = {}, callback = null) {
+    // In development/testing mode, simulate responses
+    if (this.debugMode || window.location.protocol === "file:") {
+      console.log(
+        `[VehicleLoader] Debug: Simulating callback for ${endpoint}`,
+        data
+      );
+
+      if (callback) {
+        setTimeout(() => {
+          const mockResponse = this.getMockResponse(endpoint, data);
+          callback(mockResponse);
+        }, 100);
+      }
+      return;
+    }
+
     fetch(`https://${this.getParentResourceName()}/${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -774,7 +790,10 @@ class VehicleLoaderUI {
 
         // For certain endpoints, don't show error notifications
         if (endpoint !== "closeMenu" && endpoint !== "requestUpdate") {
-          this.showNotification("Connection error", "error");
+          this.showNotification(
+            "Connection error - Check if resource is running",
+            "error"
+          );
           this.updateConnectionStatus("disconnected");
         }
 
@@ -783,6 +802,27 @@ class VehicleLoaderUI {
           callback({ success: false, message: "Connection error" });
         }
       });
+  }
+
+  getMockResponse(endpoint, data) {
+    switch (endpoint) {
+      case "closeMenu":
+        return { status: "ok" };
+      case "loadVehicle":
+        return {
+          success: true,
+          message: "Vehicle loaded successfully (Debug Mode)",
+        };
+      case "unloadVehicle":
+        return {
+          success: true,
+          message: "Vehicle unloaded successfully (Debug Mode)",
+        };
+      case "requestUpdate":
+        return { status: "ok" };
+      default:
+        return { success: false, message: "Unknown endpoint" };
+    }
   }
 
   getParentResourceName() {

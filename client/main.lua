@@ -562,6 +562,25 @@ function IsVehicleLoaded(vehicle)
     return false
 end
 
+-- Enhanced blacklist checking
+function IsVehicleBlacklisted(modelName, vehicleClass)
+    -- Check blacklisted vehicles
+    for _, blacklistedModel in pairs(Config.BlacklistedVehicles) do
+        if string.lower(blacklistedModel) == string.lower(modelName) then
+            return true
+        end
+    end
+
+    -- Check blacklisted classes
+    for _, blacklistedClass in pairs(Config.BlacklistedClasses) do
+        if blacklistedClass == vehicleClass then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- Cleanup thread
 Citizen.CreateThread(function()
     while true do
@@ -592,7 +611,12 @@ end
 
 -- Initialize client
 Citizen.CreateThread(function()
+    -- Wait a bit for everything to load
+    Citizen.Wait(1000)
+
     if Config.Debug then
         print("[VehicleLoader] Client initialized successfully")
+        print(string.format("[VehicleLoader] Config: Debug=%s, MaxDistance=%.1f",
+            tostring(Config.Debug), Config.Distances.MAX_INTERACTION))
     end
 end)
