@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Loader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app" class="hidden">
+        <div class="menu-container">
+            <div class="menu-header">
+                <h1 id="menu-title">Vehicle Loader</h1>
+                <button id="close-btn" class="close-btn">&times;</button>
+            </div>
+
+            <div class="menu-content">
+                <!-- Trailer Information -->
+                <div class="section trailer-info">
+                    <h2>Trailer Information</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Model:</span>
+                            <span id="trailer-model" class="value">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Capacity:</span>
+                            <span id="trailer-capacity" class="value">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Loaded:</span>
+                            <span id="trailer-loaded" class="value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loaded Vehicles -->
+                <div class="section loaded-vehicles">
+                    <h2>Loaded Vehicles</h2>
+                    <div id="loaded-vehicles-list" class="vehicle-list">
+                        <div class="empty-state">
+                            <p>No vehicles loaded</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Vehicles -->
+                <div class="section available-vehicles">
+                    <h2>Available Vehicles</h2>
+                    <div class="search-container">
+                        <input type="text" id="vehicle-search" placeholder="Search vehicles..." class="search-input">
+                        <select id="class-filter" class="filter-select">
+                            <option value="">All Classes</option>
+                        </select>
+                    </div>
+                    <div id="available-vehicles-list" class="vehicle-list">
+                        <div class="empty-state">
+                            <p>No vehicles available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-footer">
+                <div class="controls-info">
+                    <div class="control-item">
+                        <kbd>G</kbd> Quick Load
+                    </div>
+                    <div class="control-item">
+                        <kbd>H</kbd> Quick Unload
+                    </div>
+                    <div class="control-item">
+                        <kbd>ESC</kbd> Close Menu
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Loading...</p>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
