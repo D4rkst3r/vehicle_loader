@@ -4,6 +4,18 @@ local MenuOpen = false
 local PlayerPed = nil
 local PlayerVehicle = nil
 
+-- Accessor functions for LoadedVehicles
+function GetLoadedVehicles()
+    return LoadedVehicles
+end
+
+function SetLoadedVehicleSlot(trailerId, slotIndex, data)
+    if not LoadedVehicles[trailerId] then
+        LoadedVehicles[trailerId] = {}
+    end
+    LoadedVehicles[trailerId][slotIndex] = data
+end
+
 -- Initialize
 Citizen.CreateThread(function()
     while true do
@@ -214,8 +226,19 @@ function UnloadVehicleQuick()
     end
 
     local trailerId = NetworkGetNetworkIdFromEntity(CurrentTrailer)
-    if LoadedVehicles[trailerId] and #LoadedVehicles[trailerId] > 0 then
-        UnloadVehicleFromTrailer(#LoadedVehicles[trailerId], CurrentTrailer)
+    if LoadedVehicles[trailerId] and next(LoadedVehicles[trailerId]) then
+        -- Find the highest slot number to unload the last loaded vehicle
+        local highestSlot = 0
+        for slot, _ in pairs(LoadedVehicles[trailerId]) do
+            if slot > highestSlot then
+                highestSlot = slot
+            end
+        end
+        if highestSlot > 0 then
+            UnloadVehicleFromTrailer(highestSlot, CurrentTrailer)
+        else
+            ShowNotification(Config.Locales[Config.Locale]['no_vehicle'])
+        end
     else
         ShowNotification(Config.Locales[Config.Locale]['no_vehicle'])
     end
