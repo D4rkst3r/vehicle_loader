@@ -4,7 +4,7 @@ game 'gta5'
 author 'D4rkst3r'
 description 'Professional Vehicle Loader System - Enhanced Edition'
 version '2.0.0'
-url 'https://github.com/your-repo/vehicle-loader'
+url 'https://github.com/D4rkst3r/vehicle_loader'
 
 -- Lua 5.4 compatibility
 lua54 'yes'
@@ -85,5 +85,5 @@ set_convar "vehicleloader_check_ownership" "false"
 set_convar "vehicleloader_auto_cleanup" "true"
 
 -- Resource information
-repository 'https://github.com/your-repo/vehicle-loader'
-issues 'https://github.com/your-repo/vehicle-loader/issues'
+repository 'https://github.com/D4rkst3r/vehicle_loader'
+issues 'https://github.com/D4rkst3r/vehicle_loader/issues'

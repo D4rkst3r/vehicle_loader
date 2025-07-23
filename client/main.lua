@@ -266,7 +266,9 @@ RegisterNUICallback('closeMenu', function(data, cb)
     MenuOpen = false
     SetNuiFocus(false, false)
     PlaySound(Config.Sounds.menu_close)
-    cb('ok')
+
+    -- Always send a response
+    cb({ status = 'ok' })
 end)
 
 RegisterNUICallback('loadVehicle', function(data, cb)
@@ -276,6 +278,11 @@ RegisterNUICallback('loadVehicle', function(data, cb)
     end
 
     local vehicleId = tonumber(data.vehicleId)
+    if not vehicleId then
+        cb({ success = false, message = "Invalid vehicle ID" })
+        return
+    end
+
     LoadVehicleToTrailer(vehicleId, CurrentTrailer, function(result)
         cb(result)
         if result.success then
@@ -291,6 +298,11 @@ RegisterNUICallback('unloadVehicle', function(data, cb)
     end
 
     local slotIndex = tonumber(data.slotIndex)
+    if not slotIndex then
+        cb({ success = false, message = "Invalid slot index" })
+        return
+    end
+
     UnloadVehicleFromTrailer(slotIndex, CurrentTrailer, function(result)
         cb(result)
         if result.success then
@@ -301,7 +313,7 @@ end)
 
 RegisterNUICallback('requestUpdate', function(data, cb)
     RequestMenuUpdate()
-    cb('ok')
+    cb({ status = 'ok' })
 end)
 
 -- Get loaded vehicles data for UI

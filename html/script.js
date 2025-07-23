@@ -748,7 +748,21 @@ class VehicleLoaderUI {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        // Check if response is ok and has content
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Check if response has content
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          return response.json();
+        } else {
+          // If no JSON content, return empty object
+          return {};
+        }
+      })
       .then((result) => {
         if (callback) callback(result);
       })
@@ -757,8 +771,17 @@ class VehicleLoaderUI {
           `[VehicleLoader] NUI Callback Error (${endpoint}):`,
           error
         );
-        this.showNotification("Connection error", "error");
-        this.updateConnectionStatus("disconnected");
+
+        // For certain endpoints, don't show error notifications
+        if (endpoint !== "closeMenu" && endpoint !== "requestUpdate") {
+          this.showNotification("Connection error", "error");
+          this.updateConnectionStatus("disconnected");
+        }
+
+        // Call callback with default result if provided
+        if (callback) {
+          callback({ success: false, message: "Connection error" });
+        }
       });
   }
 

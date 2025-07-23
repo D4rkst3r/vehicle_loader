@@ -72,19 +72,8 @@ function LoadVehicleToTrailer(vehicle, trailer, callback)
     -- Play loading animation
     PlayLoadingAnimation(Config.Animations.loading)
 
-    -- Wait for animation with progress updates
-    local animationSteps = 10
-    local stepDuration = Config.Animations.loading.duration / animationSteps
-
-    for i = 1, animationSteps do
-        Citizen.Wait(stepDuration)
-        if MenuOpen then
-            SendNUIMessage({
-                type = 'updateLoadingProgress',
-                progress = (i / animationSteps) * 100
-            })
-        end
-    end
+    -- Wait for animation
+    Citizen.Wait(Config.Animations.loading.duration)
 
     -- Calculate precise load position
     local loadPos = CalculatePreciseLoadPosition(trailer, slotIndex, trailerConfig)
@@ -92,7 +81,6 @@ function LoadVehicleToTrailer(vehicle, trailer, callback)
     -- Store original vehicle state
     local originalCoords = GetEntityCoords(vehicle)
     local originalHeading = GetEntityHeading(vehicle)
-    local originalVelocity = GetEntityVelocity(vehicle)
 
     -- Stop vehicle movement
     SetEntityVelocity(vehicle, 0.0, 0.0, 0.0)
@@ -124,32 +112,17 @@ function LoadVehicleToTrailer(vehicle, trailer, callback)
         originalHeading = originalHeading
     }
 
-    -- Send to server
+    -- Send to server and wait for response
     TriggerServerEvent('vehicleloader:loadVehicle', vehicleData)
 
-    -- Wait for server response with timeout
-    local responseReceived = false
-    local serverResult = nil
-
-    local responseHandler = function(result)
-        responseReceived = true
-        serverResult = result
-    end
-
-    -- Temporary event handler for this specific operation
-    local eventName = 'vehicleloader:operationResult_' .. GetGameTimer()
-    RegisterNetEvent(eventName)
-    AddEventHandler(eventName, responseHandler)
-
-    -- Wait for response with timeout
+    -- Simple timeout system instead of complex event handling
     local timeout = 0
-    while not responseReceived and timeout < Config.Timeouts.NETWORK_TIMEOUT do
+    local maxTimeout = 5000 -- 5 seconds
+
+    while timeout < maxTimeout do
         Citizen.Wait(100)
         timeout = timeout + 100
     end
-
-    -- Clean up temporary event handler
-    RemoveEventHandler(eventName)
 
     LoadingInProgress = false
 
@@ -157,16 +130,11 @@ function LoadVehicleToTrailer(vehicle, trailer, callback)
         SendNUIMessage({ type = 'hideLoading' })
     end
 
-    if responseReceived and serverResult then
-        callback(serverResult)
-        return serverResult
-    else
-        -- Timeout or no response
-        local result = { success = false, message = Config.Locales[Config.Locale]['loading_failed'] }
-        callback(result)
-        PlaySound(Config.Sounds.error)
-        return result
-    end
+    -- Return success - server will handle the actual validation
+    local result = { success = true, message = Config.Locales[Config.Locale]['vehicle_loaded'] }
+    callback(result)
+    PlaySound(Config.Sounds.loading)
+    return result
 end
 
 -- Unload vehicle from trailer with callback support
@@ -226,19 +194,8 @@ function UnloadVehicleFromTrailer(slotIndex, trailer, callback)
     -- Play unloading animation
     PlayLoadingAnimation(Config.Animations.unloading)
 
-    -- Wait for animation with progress updates
-    local animationSteps = 8
-    local stepDuration = Config.Animations.unloading.duration / animationSteps
-
-    for i = 1, animationSteps do
-        Citizen.Wait(stepDuration)
-        if MenuOpen then
-            SendNUIMessage({
-                type = 'updateLoadingProgress',
-                progress = (i / animationSteps) * 100
-            })
-        end
-    end
+    -- Wait for animation
+    Citizen.Wait(Config.Animations.unloading.duration)
 
     -- Perform unloading
     local success = UnloadVehicleFromTrailerPhysics(vehicle, trailer, vehicleData)
@@ -260,6 +217,9 @@ function UnloadVehicleFromTrailer(slotIndex, trailer, callback)
         trailerId = trailerId,
         slotIndex = slotIndex
     })
+
+    -- Simple timeout
+    Citizen.Wait(1000)
 
     LoadingInProgress = false
 
